@@ -1,4 +1,10 @@
 var server = require("./server");
 var router = require("./router");
+var requestHandlers = require("./requesthandlers");
 
-server.start(router.route);
+var handle = {};
+handle["/"] = requestHandlers.hello;
+handle["/hej"] = requestHandlers.hello;
+handle["/newuser"] = requestHandlers.regAccount;
+
+server.start(router.route, handle);
