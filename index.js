@@ -6,5 +6,7 @@ var handle = {};
 handle["/"] = requestHandlers.hello;
 handle["/hej"] = requestHandlers.hello;
 handle["/newuser"] = requestHandlers.regAccount;
+handle["/users"] = requestHandlers.users;
+handle["/adduser"] = requestHandlers.addAccount;
 
 server.start(router.route, handle);
