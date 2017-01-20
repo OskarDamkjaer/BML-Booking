@@ -31,7 +31,14 @@ function addAccount(response, request) {
     response.writeHead(200, {"Content-Type": "text/html"});
     response.write("Hej, " + fields.name + "!");
     response.end();
-    fs.appendFile("users.txt", fields.name+"\n", function(err) {
+    fs.appendFile("users.txt", fields.name+"\n\t"
+      +fields.email+"\n\t"
+      +fields.pnbr+"\n\t"
+      +fields.addr+"\n\t"
+      +fields.postalcode+"\n\t"
+      +fields.town+"\n\t"
+      +fields.passw+"\n\n",
+      function(err) {
       if (err) {
         console.log("Error while appending users!" + err);
       }
