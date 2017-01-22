@@ -1,0 +1,28 @@
+{
+  "name": "bml-booking",
+  "version": "0.1.0",
+  "description": "Member registration and ticket booking system for the Basement LAN organization.",
+  "main": "index.js",
+  "dependencies": {
+    "formidable": "^1.1.1",
+    "mongodb": "^2.2.21",
+    "mongoose": "^4.7.7"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hnrklssn/BML-Booking.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hnrklssn/BML-Booking/issues"
+  },
+  "homepage": "https://github.com/hnrklssn/BML-Booking#readme"
+}
