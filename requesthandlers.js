@@ -48,7 +48,7 @@ function users(response, request) {
   console.log("Requested user list page");
   response.writeHead(200, {"Content-Type": "text/plain"});
   response.write("Användare:\n");
-  User.find({name: "Henrik Olsson"}, function(err, users) {
+  User.find({}, function(err, users) {
     if (err) {
       console.log("Error!", err);
     }
