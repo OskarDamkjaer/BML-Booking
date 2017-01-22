@@ -16,6 +16,9 @@ var AccountSchema = Schema({
   pcode: {
     type: Number
   },
+  town: {
+    type: String
+  },
   passw: {
     type: String
   }
