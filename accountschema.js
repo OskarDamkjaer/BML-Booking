@@ -1,4 +1,4 @@
-var mongoose = require('monoose');
+var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var AccountSchema = Schema({
   name: {
@@ -23,4 +23,4 @@ var AccountSchema = Schema({
 
 var AccountModel = mongoose.model('Account', AccountSchema);
 
-module.exports = AccountModel;
+exports.AccountModel = AccountModel;
