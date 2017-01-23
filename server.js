@@ -1,16 +1,20 @@
-var http = require("http");
-var url = require("url");
+var express = require("express");
+var server = express();
 
-function start(route, handle) {
-	function onRequest(request, response){
-		var postData = "";
-		var pathname = url.parse(request.url).pathname;
-		console.log("Request for "+pathname+" received");
-		route(handle, pathname, response, request);
-	}
+server.use(function(req, res, next) {
+	console.log("New ", req.method, " request to: ", req.path);
+	next();
+});
 
-	http.createServer(onRequest).listen(8888);
+function setRoutes(router) {
+	console.log(router);
+	server.use("/", router);
+}
+
+function start() {
+	server.listen(8888);
 	console.log("Server has started");
 }
 
 exports.start = start;
+exports.setRoutes = setRoutes

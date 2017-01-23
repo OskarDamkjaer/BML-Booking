@@ -5,34 +5,29 @@ var formidable = require('formidable');
 var db = require('./db');
 var User = db.User;
 
-function hello(response, request) {
+function hello(req, res) {
   console.log("Requested Hello World page");
-
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  response.write("Hello World");
-  response.end();
+  res.write("Hello World");
+  res.end();
 }
 
-function regAccount(response, request) {
-  console.log(request);
-  console.log(request.length);
+function regAccount(req, res) {
+  // console.log(req);
   console.log("Requested account registration page");
   exec("cat ./assets/html/userform.html", function (error, stdout, stderr) {
-    response.writeHead(200, {"Content-Type": "text/html"});
-    response.write(stdout);
-    response.end();
+    res.write(stdout);
+    res.end();
   });
 }
 
-function addAccount(response, request) {
+function addAccount(req, res) {
   console.log("Requested to register user");
-  //console.log(request);
+  //console.log(req);
   var form = new formidable.IncomingForm();
-  form.parse(request, function(error, fields, files) {
+  form.parse(req, function(error, fields, files) {
     console.log(fields);
-    response.writeHead(200, {"Content-Type": "text/html"});
-    response.write("Hej, " + fields.name + "!");
-    response.end();
+    res.write("Hej, " + fields.name + "!");
+    res.end();
     var user = new User(fields);
     user.save(function(err) {
       if (err) {
@@ -44,17 +39,17 @@ function addAccount(response, request) {
   });
 };
 
-function users(response, request) {
+function users(req, res) {
   console.log("Requested user list page");
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  response.write("Användare:\n");
+  // res.writeHead(200, {"Content-Type": "text/plain"});
+  res.write("Användare:\n");
   User.find({}, function(err, users) {
     if (err) {
       console.log("Error!", err);
     }
     console.log(users);
-    response.write(JSON.stringify(users));
-    response.end();
+    res.write(JSON.stringify(users));
+    res.end();
   });
 }
 
