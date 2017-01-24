@@ -25,8 +25,10 @@ describe("AccountsDB", function() {
   });
   
   afterEach(function(done) {
-    User.remove({}, function() {
-      done();
+    User.find({}, function(err, users) {
+      User.remove({}, function() {
+        done();
+      });
     });
   });
   
@@ -42,15 +44,15 @@ describe("AccountsDB", function() {
     });
     newUser.save(function(err) {
       expect(err).to.be.null;
+      expect(newUser.name).to.equal("Test2 Name2");
+      expect(newUser.email).to.equal("test2@mail.xyz");
+      expect(newUser.pnum).to.equal("001298-0276");
+      expect(newUser.addr).to.equal("254 Fake Avenue");
+      expect(newUser.pcode).to.equal(29403);
+      expect(newUser.town).to.equal("Emptytown");
+      expect(newUser.passw).to.not.equal("m3h5eCur3");
+      done();
     });
-    expect(newUser.name).to.equal("Test2 Name2");
-    expect(newUser.email).to.equal("test2@mail.xyz");
-    expect(newUser.pnum).to.equal("001298-0276");
-    expect(newUser.addr).to.equal("254 Fake Avenue");
-    expect(newUser.pcode).to.equal(29403);
-    expect(newUser.town).to.equal("Emptytown");
-    expect(newUser.passw).to.not.equal("m3h5eCur3");
-    done();
   });
   
   it("salts and hashes passwords", function(done) {
@@ -74,17 +76,26 @@ describe("AccountsDB", function() {
     });
     newUser.save(function(err) {
       expect(err).to.be.null;
+      newUser2.save(function(err2) {
+        expect(err2).to.be.null;
+        expect(newUser.passw).to.not.equal("53cR37");
+        expect(newUser2.passw).to.not.equal("53cR37");
+        expect(newUser.passw).to.not.equal(newUser2.passw);
+        done();
+      });
     });
-    expect(newUser.passw).to.not.equal("53cR37");
-    expect(newUser2.passw).to.not.equal("53cR37");
-    expect(newUser.passw).to.not.equal(newUser2.passw);
-    done();
   });
   
   it("authenticates user with correct password", function(done) {
     user.authenticate(currentUser.pnum, "s00pr5eCur3", function(status, authUser) {
       expect(status).to.equal(true);
-      expect(authUser).to.deep.equal(currentUser);
+      expect(authUser.name).to.equal(currentUser.name);
+      expect(authUser.email).to.equal(currentUser.email);
+      expect(authUser.pnum).to.equal(currentUser.pnum);
+      expect(authUser.addr).to.equal(currentUser.addr);
+      expect(authUser.pcode).to.equal(currentUser.pcode);
+      expect(authUser.town).to.equal(currentUser.town);
+      expect(authUser.passw).to.equal(currentUser.passw);
       done();
     });
   });
@@ -93,6 +104,48 @@ describe("AccountsDB", function() {
     user.authenticate(currentUser.pnum, "wrongpass", function(status, authUser) {
       expect(status).to.equal(false);
       expect(authUser).to.be.null;
+      done();
+    });
+  });
+  
+  it("does not differentiate between nonexistent ID and incorrect password", function(done) {
+    user.authenticate(currentUser.pnum, "wrongpass", function(status, authUser) {
+      user.authenticate("845299-8080", "userdoesnotexist", function(status2, authUser2) {
+        expect(status).to.equal(status2);
+        expect(authUser).to.equal(authUser2);
+        done();
+      });
+    });
+  });
+  
+  it("does not allow two users with the same pnum to be created", function(done) {
+    newuser = new User({
+      name: "Te3245st Name",
+      email: "test@ma45il.xyz",
+      pnum: "001298-0076",  //same as earlier record
+      addr: "54 Fak345e Avenue",
+      pcode: "09103",
+      town: "Nowhere Creek",
+      passw: "passw123"
+    });
+    newuser.save(function(err) {
+      expect(err).to.not.be.null;
+      done();
+    });
+  });
+    
+  it("does not allow two users with the same email to be created", function(done) {
+    newuser = new User({
+      name: "Te3245st Name",
+      email: "test@mail.xyz",  //same as earlier record
+      pnum: "034658-3576",
+      addr: "54 Fak345e Avenue",
+      pcode: "09103",
+      town: "Nowhere Creek",
+      passw: "passw123"
+    });
+    newuser.save(function(err) {
+      expect(err).to.not.be.null;
       done();
     });
   });
