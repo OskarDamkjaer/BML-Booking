@@ -24,6 +24,11 @@ var AccountSchema = Schema({
   }
 });
 
+function authenticate(pnum, pass, callback) {
+  callback();
+}
+
 var AccountModel = mongoose.model('Account', AccountSchema);
 
 exports.AccountModel = AccountModel;
+exports.authenticate = authenticate;
