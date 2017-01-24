@@ -5,8 +5,12 @@ var mongo = null;
 mongoose.Promise = global.Promise;
 
 function connect() {
-  mongoose.connect(url);
-  console.log('Connected to database')
+  mongoose.connection.on("connected", function() {
+    console.log('Connected to database')
+  });
+  mongoose.connect(url, function(err) {
+    if (err) throw err;
+  });
 }
 
 exports.User = accountschema.AccountModel;

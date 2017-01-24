@@ -7,7 +7,6 @@ server.use(function(req, res, next) {
 });
 
 function setRoutes(router) {
-	console.log(router);
 	server.use("/", router);
 }
 

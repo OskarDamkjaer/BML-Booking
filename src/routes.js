@@ -8,6 +8,5 @@ router.get("/newuser",  handlers.regAccount);
 router.get("/users",    handlers.users);
 
 router.post("/adduser", handlers.addAccount);
-console.log(router, "hej");
 
 exports.routes = router;
