@@ -26,14 +26,15 @@ function addAccount(req, res) {
   var form = new formidable.IncomingForm();
   form.parse(req, function(error, fields, files) {
     console.log(fields);
-    res.write("Hej, " + fields.name + "!");
-    res.end();
     var user = new User(fields);
     user.save(function(err) {
       if (err) {
         console.log(err);
       } else {
         console.log('Added', user);
+        res.statusCode = 200;
+        res.json({ errors: null, name: user.name });
+        res.end();
       }
     });
   });
