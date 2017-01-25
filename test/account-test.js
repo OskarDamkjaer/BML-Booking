@@ -202,7 +202,7 @@ describe("User Account REST API", function() {
         expect(res.body.name).to.equal(newUser.name);
         User.find({ name: newUser.name }, function(err, users) {
           expect(err).to.be.null;
-          expect(users).to.deeply.contain(newUser.name);
+          expect(users[0]).to.have.property("name", newUser.name);
           done();
         });
       });
