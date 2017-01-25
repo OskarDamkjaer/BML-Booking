@@ -150,3 +150,61 @@ describe("AccountsDB", function() {
     });
   });
 });
+
+var chaiHttp = require("chai-http");
+chai.use(chaiHttp);
+var server = require("../src/server");
+var routes = require("../src/routes");
+server.setRoutes(routes.routes);
+server.start();
+
+describe("User Account REST API", function() {
+  
+  beforeEach(function(done) {
+    currentUser = new User({
+      name: "Test Name",
+      email: "test@mail.xyz",
+      pnum: "001298-0076",
+      addr: "54 Fake Avenue",
+      pcode: "89403",
+      town: "Emptyville",
+      passw: "s00pr5eCur3"
+    });
+    currentUser.save(function(err) {
+      done();
+    });
+  });
+  
+  afterEach(function(done) {
+    User.remove({}, function() {
+      done();
+    });
+  });
+  
+  it("should add users with POST /adduser", function(done) {
+    var newUser = {
+      name: "Test2 N45ame",
+      email: "t3st@email.abc",
+      pnum: "873457-8954",
+      addr: "1010 Binary Way",
+      pcode: "98351",
+      town: "Digiville",
+      passw: "l33th4xxp455"
+    }
+    chai.request(server.app)
+      .post("/adduser")
+      .send(newUser)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.all.keys("errors", "name");
+        expect(res.body.errors).to.be.null;
+        expect(res.body.name).to.equal(newUser.name);
+        User.find({ name: newUser.name }, function(err, users) {
+          expect(err).to.be.null;
+          expect(users).to.deeply.contain(newUser.name);
+          done();
+        });
+      });
+  });
+});

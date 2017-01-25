@@ -16,4 +16,5 @@ function start() {
 }
 
 exports.start = start;
-exports.setRoutes = setRoutes
+exports.setRoutes = setRoutes;
+exports.app = server; //for use in API testing
