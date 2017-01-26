@@ -207,4 +207,120 @@ describe("User Account REST API", function() {
         });
       });
   });
+  
+  it("should not register users with bad request structure", function(done) {
+    var newUser = {
+      name: "Test2 N45ame",
+      email: "t3st@email.abc",
+      pnum: "873457-8954",
+      addr: "1010 Binary Way",
+      town: "Digiville",
+      passw: "l33th4xxp455",
+      extraProp: "incorrect"
+    };
+    chai.request(server.app)
+      .post("/adduser")
+      .send(newUser)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(400);
+        expect(res.body).to.have.all.keys("errors", "name");
+        expect(res.body.name).to.be.null;
+        expect(res.body.errors).to.have.all.keys(["missing", "extra", "bad value"]);
+        expect(res.body.errors).to.have.property({ "bad value": null });
+        expect(res.body.errors).to.have.deep.property({ extra: { extraProp: "incorrect" } });
+        expect(res.body.errors).to.have.property({ missing: "pcode" });
+        User.find({ name: newUser.name }, function(err, users) {
+          expect(err).to.not.be.null;
+          expect(users).to.be.empty;
+          done();
+        });
+      });
+  });
+  
+  it("should not register users with impossible email or personal number", function(done) {
+    var newUser = {
+      name: "Test2 N45ame",
+      email: "t3st.email.abc",  //no @
+      pnum: "873457-89547",     //extra digit
+      addr: "1010 Binary Way",
+      pcode: "23457",
+      town: "Digiville",
+      passw: "l33th4xxp455"
+    };
+    chai.request(server.app)
+      .post("/adduser")
+      .send(newUser)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(400);
+        expect(res.body).to.have.all.keys("errors", "name");
+        expect(res.body.name).to.be.null;
+        expect(res.body.errors).to.have.all.keys(["missing", "extra", "bad value"]);
+        expect(res.body.errors).to.have.deep.property({ "bad value": {
+          email: "t3st.email.abc",
+          pnum: "873457-89547"
+        }});
+        expect(res.body.errors.extra).to.be.null;
+        expect(res.body.errors.missing).to.be.null;
+        User.find({ name: newUser.name }, function(err, users) {
+          expect(err).to.not.be.null;
+          expect(users).to.be.empty;
+          done();
+        });
+      });
+  });
+  
+  it("should not register users with the same email or personal number", function(done) {
+    var newUser = {
+      name: "Test2 N45ame",
+      email: "t3st@email.abc",
+      pnum: "001298-0076", //same as previous user
+      addr: "1010 Binary Way",
+      pcode: "89532",
+      town: "Digiville",
+      passw: "l33th4xxp455"
+    };
+    var newUser2 = {
+      name: "Test2 N45ame",
+      email: "test@mail.xyz", //same as previous user 
+      pnum: "324561-7363",
+      addr: "1010 Binary Way",
+      pcode: "89532",
+      town: "Digiville",
+      passw: "l33th4xxp455"
+    };
+    chai.request(server.app)
+      .post("/adduser")
+      .send(newUser)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(400);
+        expect(res.body).to.have.all.keys("errors", "name");
+        expect(res.body.name).to.be.null;
+        expect(res.body.errors).to.include({ "user already exists": 
+          { pnum: true, email: false } });
+        User.find({ name: newUser.name }, function(err, users) {
+          expect(err).to.not.be.null;
+          expect(users).to.be.empty;
+          chai.request(server.app)
+            .post("/adduser")
+            .send(newUser2)
+            .end(function(err, res) {
+              expect(err).to.be.null;
+              expect(res).to.have.status(400);
+              expect(res.body).to.have.all.keys("errors", "name");
+              expect(res.body.name).to.be.null;
+              expect(res.body.errors).to.include({ "user already exists": 
+                { pnum: false, email: true } });
+              User.find({ name: newUser2.name }, function(err, users) {
+                expect(err).to.not.be.null;
+                expect(users).to.be.empty;
+                done();
+              });
+            });
+        });
+      });
+  });
+  
 });
