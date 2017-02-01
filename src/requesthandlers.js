@@ -38,7 +38,8 @@ function addAccountStructureCheck(req, res, next) {
     addr:   null,
     pcode:  null,
     town:   null,
-    passw:  null
+    passw:  null,
+    phone:  null
   }
   for(key in req.body) {
     if(correctStructure.hasOwnProperty(key)) {

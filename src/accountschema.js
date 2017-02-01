@@ -8,7 +8,8 @@ var AccountSchema = new Schema({
   addr:   { type: String },
   pcode:  { type: Number },
   town:   { type: String },
-  passw:  { type: String, bcrypt: true }
+  passw:  { type: String, bcrypt: true },
+  phone:  { type: String }
 });
 
 AccountSchema.plugin(bcrypt);
