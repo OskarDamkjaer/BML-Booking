@@ -12,7 +12,6 @@ function hello(req, res) {
 }
 
 function regAccount(req, res) {
-  // console.log(req);
   console.log("Requested account registration page");
   exec("cat ./assets/html/userform.html", function (error, stdout, stderr) {
     res.write(stdout);
@@ -20,29 +19,128 @@ function regAccount(req, res) {
   });
 }
 
-function addAccount(req, res) {
-  console.log("Requested to register user");
-  //console.log(req);
-  var form = new formidable.IncomingForm();
-  form.parse(req, function(error, fields, files) {
-    console.log(fields);
-    var user = new User(fields);
-    user.save(function(err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Added', user);
-        res.statusCode = 200;
-        res.json({ errors: null, name: user.name });
-        res.end();
+function addAccountErrorHandlingStart(req, res, next) {
+  //passes this object to all other functions in the middleware chain
+  res.locals.errors = {
+    missing: null,
+    extra: null,
+    "bad value": null,
+    "user already exists": null
+  };
+  next();
+}
+
+function addAccountStructureCheck(req, res, next) {
+  var correctStructure = {
+    name:   null,
+    email:  null,
+    pnum:   null,
+    addr:   null,
+    pcode:  null,
+    town:   null,
+    passw:  null
+  }
+  for(key in req.body) {
+    if(correctStructure.hasOwnProperty(key)) {
+      correctStructure[key] = req.body[key];
+    } else {
+      if(res.locals.errors["extra"] == null) {
+        res.locals.errors["extra"] = [];
+      }
+      res.locals.errors["extra"].push(key);
+    }
+  }
+  for(key in correctStructure) {
+    if(correctStructure[key] == null) {
+      if(res.locals.errors["missing"] == null) {
+        res.locals.errors["missing"] = [];
+      }
+      res.locals.errors["missing"].push(key);
+    }
+  }
+  next();
+}
+
+
+function addAccountValueCheck(req, res, next) {
+  var acceptableValues = {
+    name:   /(\w+ )+\w+/,
+    //don't try to figure the email out, it works..
+    email:  /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
+    pnum:   /^[0-9]{6}\-[0-9]{4}$/,
+    addr:   /^((\w+\s*)+\d+|\d+(\w+\s*)+)$/,
+    pcode:  /^\d{5}$/,
+    town:   /^[\w\s]+$/,
+    passw:  /^.*$/
+  }
+  for(key in req.body) {
+    if(acceptableValues.hasOwnProperty(key) && !acceptableValues[key].test(req.body[key])) {
+      if(res.locals.errors["bad value"] == null) {
+        res.locals.errors["bad value"] = [];
+      }
+      res.locals.errors["bad value"].push(key);
+    }
+  }
+  next();
+}
+
+function addAccountUserExistsCheck(req, res, next) {
+  if(req.body.hasOwnProperty("pnum")) {    
+    User.find({ pnum: req.body["pnum"] }, function(err, users) {
+      if (users.length > 0) {
+        if(res.locals.errors["user already exists"] == null) {
+          res.locals.errors["user already exists"] = [];
+        }
+        res.locals.errors["user already exists"].push("pnum");
       }
     });
+  }
+  if(req.body.hasOwnProperty("email")) {
+    User.find({ email: req.body["email"] }, function(err, users) {
+      if (users.length > 0) {
+        if(res.locals.errors["user already exists"] == null) {
+          res.locals.errors["user already exists"] = [];
+        }
+        res.locals.errors["user already exists"].push("email");
+      }
+      next();
+    });
+  }
+}
+
+function checkErrors(req, res, next) {
+  var containsError = false;
+  for(key in res.locals.errors) {
+    if(res.locals.errors[key] != null) {
+      containsError = true;
+    }
+  }
+  if(containsError) {
+    next({ statusCode: 400, body: { errors: res.locals.errors, name: null } });
+  } else {
+    next();
+  }
+}
+
+function addAccount(req, res) {
+  console.log("Request to register user");
+  var fields = req.body;
+  console.log(fields);
+  var user = new User(fields);
+  user.save(function(err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('Added', user);
+      res.statusCode = 200;
+      res.json({ errors: null, name: user.name });
+      res.end();
+    }
   });
 };
 
 function users(req, res) {
   console.log("Requested user list page");
-  // res.writeHead(200, {"Content-Type": "text/plain"});
   res.write("Användare:\n");
   User.find({}, function(err, users) {
     if (err) {
@@ -54,7 +152,19 @@ function users(req, res) {
   });
 }
 
+function sendError(err, req, res, next) {
+  res.statusCode = err["statusCode"];
+  res.json(err["body"]);
+  res.end();
+  return next();
+}
+
 exports.hello = hello;
 exports.regAccount = regAccount;
 exports.users = users;
 exports.addAccount = addAccount;
+exports.addAccountErrorHandlingStart = addAccountErrorHandlingStart;
+exports.addAccountStructureCheck = addAccountStructureCheck;
+exports.addAccountValueCheck = addAccountValueCheck;
+exports.addAccountUserExistsCheck = addAccountUserExistsCheck;
+exports.checkErrors = checkErrors;

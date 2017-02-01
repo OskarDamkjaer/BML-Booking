@@ -7,6 +7,13 @@ router.get("/hej",      handlers.hello);
 router.get("/newuser",  handlers.regAccount);
 router.get("/users",    handlers.users);
 
-router.post("/adduser", handlers.addAccount);
+router.post("/adduser", handlers.addAccountErrorHandlingStart,
+                        handlers.addAccountStructureCheck,
+                        handlers.addAccountValueCheck,
+                        handlers.addAccountUserExistsCheck,
+                        handlers.checkErrors,
+                        handlers.addAccount);
+                        
+//router.use("/", handlers.sendError);
 
 exports.routes = router;
