@@ -17,7 +17,8 @@ describe("AccountsDB", function() {
       addr: "54 Fake Avenue",
       pcode: "89403",
       town: "Emptyville",
-      passw: "s00pr5eCur3"
+      passw: "s00pr5eCur3",
+      phone: "0758482953"
     });
     currentUser.save(function(err) {
       done();
@@ -40,7 +41,8 @@ describe("AccountsDB", function() {
       addr: "254 Fake Avenue",
       pcode: "29403",
       town: "Emptytown",
-      passw: "m3h5eCur3"
+      passw: "m3h5eCur3",
+      phone: "0735327548"
     });
     newUser.save(function(err) {
       expect(err).to.be.null;
@@ -63,7 +65,8 @@ describe("AccountsDB", function() {
       addr: "347 Non Rd",
       pcode: "23473",
       town: "None City",
-      passw: "53cR37"
+      passw: "53cR37",
+      phone: "7834249517"
     });
     newUser2 = new User({
       name: "Test4 '4' Name4",
@@ -72,7 +75,8 @@ describe("AccountsDB", function() {
       addr: "347 Non Rd",
       pcode: "35463",
       town: "None City",
-      passw: "53cR37"
+      passw: "53cR37",
+      phone: "8925760183"
     });
     newUser.save(function(err) {
       expect(err).to.be.null;
@@ -126,7 +130,8 @@ describe("AccountsDB", function() {
       addr: "54 Fak345e Avenue",
       pcode: "09103",
       town: "Nowhere Creek",
-      passw: "passw123"
+      passw: "passw123",
+      phone: "9382960313"
     });
     newuser.save(function(err) {
       expect(err).to.not.be.null;
@@ -142,7 +147,8 @@ describe("AccountsDB", function() {
       addr: "54 Fak345e Avenue",
       pcode: "09103",
       town: "Nowhere Creek",
-      passw: "passw123"
+      passw: "passw123",
+      phone: "8593028529"
     });
     newuser.save(function(err) {
       expect(err).to.not.be.null;
@@ -168,7 +174,8 @@ describe("User Account REST API", function() {
       addr: "54 Fake Avenue",
       pcode: "89403",
       town: "Emptyville",
-      passw: "s00pr5eCur3"
+      passw: "s00pr5eCur3",
+      phone: "8493820619"
     });
     currentUser.save(function(err) {
       done();
@@ -189,7 +196,8 @@ describe("User Account REST API", function() {
       addr: "1010 Binary Way",
       pcode: "98351",
       town: "Digiville",
-      passw: "l33th4xxp455"
+      passw: "l33th4xxp455",
+      phone: "9350194828"
     }
     var expected = { 
       errors: null,
@@ -218,7 +226,8 @@ describe("User Account REST API", function() {
       addr: "1010 Binary Way",
       town: "Digiville",
       passw: "l33th4xxp455",
-      extraProp: "incorrect"
+      extraProp: "incorrect",
+      phone: "5989381069"
     };
     var expected = { 
       errors: {
@@ -251,7 +260,8 @@ describe("User Account REST API", function() {
       addr: "1010 Binary Way",
       pcode: "23457",
       town: "Digiville",
-      passw: "l33th4xxp455"
+      passw: "l33th4xxp455",
+      phone: "7483921059"
     };
     var expected = { 
       errors: {
@@ -285,6 +295,7 @@ describe("User Account REST API", function() {
       pcode: "89532",
       town: "Digiville",
       passw: "l33th4xxp455"
+      phone: "8549395719"
     };
     var newUser2 = {
       name: "Test2 N45ame",
@@ -293,7 +304,8 @@ describe("User Account REST API", function() {
       addr: "1010 Binary Way",
       pcode: "89532",
       town: "Digiville",
-      passw: "l33th4xxp455"
+      passw: "l33th4xxp455",
+      phone: "4920693819"
     };
     var expected1 = { 
       errors: {
