@@ -294,7 +294,7 @@ describe("User Account REST API", function() {
       addr: "1010 Binary Way",
       pcode: "89532",
       town: "Digiville",
-      passw: "l33th4xxp455"
+      passw: "l33th4xxp455",
       phone: "8549395719"
     };
     var newUser2 = {
