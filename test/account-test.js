@@ -191,15 +191,17 @@ describe("User Account REST API", function() {
       town: "Digiville",
       passw: "l33th4xxp455"
     }
+    var expected = { 
+      errors: null,
+      name: newUser.name 
+    };
     chai.request(server.app)
       .post("/adduser")
       .send(newUser)
       .end(function(err, res) {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
-        expect(res.body).to.have.all.keys("errors", "name");
-        expect(res.body.errors).to.be.null;
-        expect(res.body.name).to.equal(newUser.name);
+        expect(res.body).to.deep.equal(expected);
         User.find({ name: newUser.name }, function(err, users) {
           expect(err).to.be.null;
           expect(users[0]).to.have.property("name", newUser.name);
@@ -218,20 +220,23 @@ describe("User Account REST API", function() {
       passw: "l33th4xxp455",
       extraProp: "incorrect"
     };
+    var expected = { 
+      errors: {
+        missing:  [ 'pcode' ],
+        extra:    [ 'extraProp' ],
+        'bad value':  null,
+        'user already exists':  null
+      },
+      name: null 
+    };
     chai.request(server.app)
       .post("/adduser")
       .send(newUser)
       .end(function(err, res) {
-        expect(err).to.be.null;
+        expect(err).to.not.be.null;
         expect(res).to.have.status(400);
-        expect(res.body).to.have.all.keys("errors", "name");
-        expect(res.body.name).to.be.null;
-        expect(res.body.errors).to.have.all.keys(["missing", "extra", "bad value"]);
-        expect(res.body.errors).to.have.property({ "bad value": null });
-        expect(res.body.errors).to.have.deep.property({ extra: { extraProp: "incorrect" } });
-        expect(res.body.errors).to.have.property({ missing: "pcode" });
+        expect(res.body).to.deep.equal(expected);
         User.find({ name: newUser.name }, function(err, users) {
-          expect(err).to.not.be.null;
           expect(users).to.be.empty;
           done();
         });
@@ -248,23 +253,23 @@ describe("User Account REST API", function() {
       town: "Digiville",
       passw: "l33th4xxp455"
     };
+    var expected = { 
+      errors: {
+        missing: null,
+        extra:   null,
+        'bad value': [ "email", "pnum" ],
+        'user already exists':  null
+      },
+      name: null 
+    };
     chai.request(server.app)
       .post("/adduser")
       .send(newUser)
       .end(function(err, res) {
-        expect(err).to.be.null;
+        expect(err).to.not.be.null;
         expect(res).to.have.status(400);
-        expect(res.body).to.have.all.keys("errors", "name");
-        expect(res.body.name).to.be.null;
-        expect(res.body.errors).to.have.all.keys(["missing", "extra", "bad value"]);
-        expect(res.body.errors).to.have.deep.property({ "bad value": {
-          email: "t3st.email.abc",
-          pnum: "873457-89547"
-        }});
-        expect(res.body.errors.extra).to.be.null;
-        expect(res.body.errors.missing).to.be.null;
+        expect(res.body).to.deep.equal(expected);
         User.find({ name: newUser.name }, function(err, users) {
-          expect(err).to.not.be.null;
           expect(users).to.be.empty;
           done();
         });
@@ -290,31 +295,43 @@ describe("User Account REST API", function() {
       town: "Digiville",
       passw: "l33th4xxp455"
     };
+    var expected1 = { 
+      errors: {
+        missing:      null,
+        extra:        null,
+        'bad value':  null,
+        'user already exists':  [ "pnum" ]
+      },
+      name: null 
+    };
+    var expected2 = { 
+      errors: {
+        missing:      null,
+        extra:        null,
+        'bad value':  null,
+        'user already exists':  [ "email" ]
+      },
+      name: null 
+    };
     chai.request(server.app)
       .post("/adduser")
       .send(newUser)
       .end(function(err, res) {
-        expect(err).to.be.null;
+        expect(err).to.not.be.null;
         expect(res).to.have.status(400);
-        expect(res.body).to.have.all.keys("errors", "name");
-        expect(res.body.name).to.be.null;
-        expect(res.body.errors).to.include({ "user already exists": 
-          { pnum: true, email: false } });
+        expect(res.body).to.deep.equal(expected1);
         User.find({ name: newUser.name }, function(err, users) {
-          expect(err).to.not.be.null;
+          expect(err).to.be.null;
           expect(users).to.be.empty;
           chai.request(server.app)
             .post("/adduser")
             .send(newUser2)
             .end(function(err, res) {
-              expect(err).to.be.null;
+              expect(err).to.not.be.null;
               expect(res).to.have.status(400);
-              expect(res.body).to.have.all.keys("errors", "name");
-              expect(res.body.name).to.be.null;
-              expect(res.body.errors).to.include({ "user already exists": 
-                { pnum: false, email: true } });
+              expect(res.body).to.deep.equal(expected2);
               User.find({ name: newUser2.name }, function(err, users) {
-                expect(err).to.not.be.null;
+                expect(err).to.be.null;
                 expect(users).to.be.empty;
                 done();
               });
