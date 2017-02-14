@@ -185,6 +185,7 @@ server.setRoutes(routes.routes);
 server.start();
 
 describe("User Account REST API", function() {
+  var currentUser = null;
   
   function nestedBeforeEach(done) {
     currentUser = new User({
@@ -377,6 +378,66 @@ describe("User Account REST API", function() {
         });
     });
   
+  });
+  
+  describe("Login", function() {
+    
+    beforeEach(nestedBeforeEach);
+    afterEach(nestedAfterEach);
+    
+    it("should let people with the right credentials log in", function(done) {
+      chai.request(server.app).post("/login")
+      .send({
+        pnum: currentUser.pnum,
+        passw: "s00pr5eCur3"
+      }).end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        done();
+      });
+    });
+    
+    it("should deny login with incorrect password", function(done) {
+      chai.request(server.app).post("/login")
+      .send({
+        pnum: currentUser.pnum,
+        passw: "badpass"
+      }).end(function(err, res) {
+        expect(err).to.not.be.null;
+        expect(res).to.have.status(401);
+        done();
+      });
+    });
+    
+    it("should deny login with incorrect pnum", function(done) {
+      chai.request(server.app).post("/login")
+      .send({
+        pnum: "496262-8693",
+        passw: "s00pr5eCur3"
+      }).end(function(err, res) {
+        expect(err).to.not.be.null;
+        expect(res).to.have.status(401);
+        done();
+      });
+    });
+    
+    it("should not differentiate between incorrect password and missing user", function(done) {
+      chai.request(server.app).post("/login")
+      .send({
+        pnum: currentUser.pnum,
+        passw: "badpass"
+      }).end(function(err1, res1) {
+        chai.request(server.app).post("/login")
+        .send({
+          pnum: "496262-8693",
+          passw: "s00pr5eCur3"
+        }).end(function(err2, res2) {
+          expect(res1.status).to.equal(res2.status);
+          expect(res1.body).to.deep.equal(res2.body);
+          done();
+        });
+      });
+    });
   });
   
 });

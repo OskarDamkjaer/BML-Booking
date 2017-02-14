@@ -4,6 +4,7 @@ var fs = require("fs");
 var formidable = require('formidable');
 var db = require('./db');
 var User = db.User;
+var schema = require('./accountschema');
 
 function hello(req, res) {
   console.log("Requested Hello World page");
@@ -160,6 +161,17 @@ function sendError(err, req, res, next) {
   return next();
 }
 
+function login(req, res) {
+  schema.authenticate(req.body.pnum, req.body.passw, function(status, authUser) {
+    if(status) {
+      res.statusCode = 200;
+    } else {
+      res.statusCode = 401;
+    }
+    res.end();
+  });
+}
+
 exports.hello = hello;
 exports.regAccount = regAccount;
 exports.users = users;
@@ -169,3 +181,4 @@ exports.addAccountStructureCheck = addAccountStructureCheck;
 exports.addAccountValueCheck = addAccountValueCheck;
 exports.addAccountUserExistsCheck = addAccountUserExistsCheck;
 exports.checkErrors = checkErrors;
+exports.login = login;

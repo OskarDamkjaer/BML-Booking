@@ -14,6 +14,8 @@ router.post("/adduser", handlers.addAccountErrorHandlingStart,
                         handlers.checkErrors,
                         handlers.addAccount);
                         
+router.post("/login",   handlers.login);
+                        
 //router.use("/", handlers.sendError);
 
 exports.routes = router;
