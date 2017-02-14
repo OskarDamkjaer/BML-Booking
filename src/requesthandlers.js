@@ -126,14 +126,12 @@ function checkErrors(req, res, next) {
 
 function addAccount(req, res) {
   console.log("Request to register user");
-  var fields = req.body;
-  console.log(fields);
-  var user = new User(fields);
+  var user = new User(req.body);
   user.save(function(err) {
     if (err) {
       console.log(err);
     } else {
-      console.log('Added', user);
+      console.log('Added');
       res.statusCode = 200;
       res.json({ errors: null, name: user.name });
       res.end();
