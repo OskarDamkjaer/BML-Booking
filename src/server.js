@@ -1,7 +1,7 @@
 var express = require("express");
 var bodyParser  = require('body-parser');
 var server = express();
-
+var session = require('express-session');
 server.use(function(req, res, next) {
 	console.log("New ", req.method, " request to: ", req.path);
 	next();
@@ -18,7 +18,13 @@ function setRoutes(router) {
 	});
 }
 
-function start() {
+function start(mongoStore, routes) {
+	server.use(session({
+  	resave: true,
+  	saveUninitialized: true,
+  	secret: "sdfasd",
+		store: mongoStore
+	}));
 	server.listen(8888);
 	console.log("Server has started");
 }

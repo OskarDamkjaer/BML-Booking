@@ -3,5 +3,5 @@ var routes = require("./routes");
 var db = require("./db");
 
 server.setRoutes(routes.routes);
-server.start();
-db.connect();
+var connection = db.connect();
+server.start(connection);

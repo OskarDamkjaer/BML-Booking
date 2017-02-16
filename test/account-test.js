@@ -181,8 +181,14 @@ var chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 var server = require("../src/server");
 var routes = require("../src/routes");
+var session = require('express-session');
+var mongoStore = require('connect-mongo')(session);
+var sessionStore = new mongoStore({
+  mongooseConnection: mongoose.connection,
+  collection: 'sessions' // default
+});
+server.start(sessionStore);
 server.setRoutes(routes.routes);
-server.start();
 
 describe("User Account REST API", function() {
   var currentUser = null;
@@ -205,7 +211,9 @@ describe("User Account REST API", function() {
   
   function nestedAfterEach(done) {
     User.remove({}, function() {
-      done();
+      sessionStore.clear(function(err) {
+        done();
+      });
     });
   }
   
@@ -436,6 +444,19 @@ describe("User Account REST API", function() {
           expect(res1.body).to.deep.equal(res2.body);
           done();
         });
+      });
+    });
+    
+    it("should set a session cookie on successful login", function(done) {
+      chai.request(server.app).post("/login")
+      .send({
+        pnum: currentUser.pnum,
+        passw: "s00pr5eCur3"
+      }).end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        expect(res.headers['set-cookie'].pop()).to.not.be.null;
+        done();
       });
     });
   });

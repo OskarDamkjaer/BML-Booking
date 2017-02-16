@@ -162,6 +162,7 @@ function sendError(err, req, res, next) {
 function login(req, res) {
   schema.authenticate(req.body.pnum, req.body.passw, function(status, authUser) {
     if(status) {
+      req.session.user = authUser;
       res.statusCode = 200;
     } else {
       res.statusCode = 401;
