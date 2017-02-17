@@ -95,17 +95,17 @@ function addAccountUserExistsCheck(req, res, next) {
         }
         res.locals.errors["user already exists"].push("pnum");
       }
-    });
-  }
-  if(req.body.hasOwnProperty("email")) {
-    User.find({ email: req.body["email"] }, function(err, users) {
-      if (users.length > 0) {
-        if(res.locals.errors["user already exists"] == null) {
-          res.locals.errors["user already exists"] = [];
-        }
-        res.locals.errors["user already exists"].push("email");
+      if(req.body.hasOwnProperty("email")) {
+        User.find({ email: req.body["email"] }, function(err, users) {
+          if (users.length > 0) {
+            if(res.locals.errors["user already exists"] == null) {
+              res.locals.errors["user already exists"] = [];
+            }
+            res.locals.errors["user already exists"].push("email");
+          }
+          next();
+        });
       }
-      next();
     });
   }
 }
@@ -162,13 +162,26 @@ function sendError(err, req, res, next) {
 function login(req, res) {
   schema.authenticate(req.body.pnum, req.body.passw, function(status, authUser) {
     if(status) {
-      req.session.user = authUser;
+      req.user = authUser.toObject();
+      delete req.user.passw
+      req.session.user = req.user;
       res.statusCode = 200;
     } else {
       res.statusCode = 401;
     }
     res.end();
   });
+}
+
+function accountInfo(req, res) {
+  if (req.session) {
+    res.statusCode = 200;
+    res.json({accountinfo: req.session.user });
+    res.end();
+  } else {
+    res.statusCode = 401;
+    res.end();
+  }
 }
 
 exports.hello = hello;
@@ -181,3 +194,4 @@ exports.addAccountValueCheck = addAccountValueCheck;
 exports.addAccountUserExistsCheck = addAccountUserExistsCheck;
 exports.checkErrors = checkErrors;
 exports.login = login;
+exports.account = accountInfo;

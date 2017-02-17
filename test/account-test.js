@@ -459,6 +459,24 @@ describe("User Account REST API", function() {
         done();
       });
     });
+    
+    it("should display user info when logged in", function(done) {
+      chai.request(server.app).post("/login")
+      .send({
+        pnum: currentUser.pnum,
+        passw: "s00pr5eCur3"
+      }).end(function(err, res) {
+        var cookie = res.headers['set-cookie'].pop().split(';')[0];
+        var req = chai.request(server.app).get("/account")
+        req.cookies = cookie;
+        req.end(function(err, res) {
+          var userCopy = JSON.parse(JSON.stringify(currentUser));
+          delete userCopy.passw;
+          expect(res.body.accountinfo).to.deep.equal(userCopy);
+          done();
+        });
+      });
+    });
   });
   
 });
