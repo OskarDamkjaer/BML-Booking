@@ -477,6 +477,28 @@ describe("User Account REST API", function() {
         });
       });
     });
+    
+    it("should allow manual logout", function(done) {
+      chai.request(server.app).post("/login")
+      .send({
+        pnum: currentUser.pnum,
+        passw: "s00pr5eCur3"
+      }).end(function(err, res) {
+        var cookie = res.headers['set-cookie'].pop().split(';')[0];
+        sessionStore.collection.count(function(err, count) {
+          expect(count).to.equal(1);
+          var req = chai.request(server.app).post("/logout")
+          req.cookies = cookie;
+          req.end(function(err, res) {
+            expect(err).to.be.null;
+            sessionStore.collection.count(function(err, count) {
+              expect(count).to.equal(0);
+              done();
+            });
+          });
+        });
+      });
+    });
   });
   
 });

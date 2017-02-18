@@ -184,6 +184,16 @@ function accountInfo(req, res) {
   }
 }
 
+function logout(req, res) {
+  if (req.session) {
+    req.session.destroy();
+    res.statusCode = 200;
+  } else {
+    res.statusCode = 401;
+  }
+  res.end();
+}
+
 exports.hello = hello;
 exports.regAccount = regAccount;
 exports.users = users;
@@ -195,3 +205,4 @@ exports.addAccountUserExistsCheck = addAccountUserExistsCheck;
 exports.checkErrors = checkErrors;
 exports.login = login;
 exports.account = accountInfo;
+exports.logout = logout;

@@ -16,6 +16,7 @@ router.post("/adduser", handlers.addAccountErrorHandlingStart,
                         handlers.addAccount);
                         
 router.post("/login",   handlers.login);
+router.post("/logout",  handlers.logout);
                         
 //router.use("/", handlers.sendError);
 
