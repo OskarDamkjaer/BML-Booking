@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <form action="/adduser" method="post" enctype="multipart/form-data">
+      <fieldset>
+        <label for="name">Namn:</label>
+        <input type="text" id="name" name="name" placeholder="Fyll i ditt namn här" />
+        <br />
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="Fyll i din mejladress" />
+        <br />
+        <label for="pnum">Personnummer:</label>
+        <input type="text" id="pnum" name="pnum" placeholder="Personnummer"></input>
+        <br />
+        <label for="addr">Adress:</label>
+        <input type="text" id="addr" name="addr" placeholder="Adress"></input>
+        <br />
+        <label for="pcode">Postnummer:</label>
+        <input type="number" id="pcode" name="pcode" placeholder="Postnummer"></input>
+        <br />
+        <label for="town">Ort:</label>
+        <input type="text" id="town" name="town" placeholder="Ort"></input>
+        <br />
+        <label for="passw">Lösenord:</label>
+        <input type="password" id="passw" name="passw" placeholder="Sparas för tillfället i klartext"></input>
+        <br />
+        <input type="submit" value="Skapa konto" />
+      </fieldset>
+    </form>
+  </body>
+</html>
